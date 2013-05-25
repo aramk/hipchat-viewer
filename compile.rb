@@ -9,10 +9,16 @@
 require 'json'
 
 if ARGV.size == 0
-	puts 'compile.rb <hipchat_export directory>'
+  default_dir = File.expand_path('./hipchat_export')
+  if File.directory? default_dir
+    dir = default_dir
+  else
+    puts 'compile.rb <hipchat_export directory>'
+    exit
+  end
+else
+  dir = ARGV[0]
 end
-
-dir = ARGV[0]
 
 # TODO add absolute relative directory support
 
