@@ -6,6 +6,7 @@ require([
         this.url = null;
         this.$urlModal = args.$urlModal;
         this.$sidebar = args.$sidebar;
+        this.$content = args.$content;
         this.dataType = 'json' || args.dataType;
         this.defaultUrl = this.currentURL() + 'hipchat_export/';
         if (!this.url) {
@@ -78,13 +79,28 @@ require([
                     if (successCallback) {
                         successCallback(data);
                     }
-                    this.rooms = data.rooms;
+                    me.rooms = data.rooms;
                     me.$sidebar.html('');
-                    $.each(this.rooms, function (i, room) {
-                        me.$sidebar.append($('<li><a href="#'+room.room_id+'"><i class="icon-chevron-right"></i> '+room.name+'</a></li>'));
+                    $.each(me.rooms, function (i, room) {
+                        me.addRoom(room);
                     });
+
+                    $('body').scrollspy({target: '.bs-docs-sidebar'});
+
+//                    $.ajax($.extend(args, {
+//                        dataType: me.dataType,
+//                        url: me.url + me.roomsURL,
+//                        success: function (data) {
+//
+//                        }
+//                    }));
                 }
             }));
+        },
+        addRoom: function (room) {
+            var me = this;
+            me.$sidebar.append($('<li><a href="#room-' + room.room_id + '"><i class="icon-chevron-right"></i> ' + room.name + '</a></li>'));
+            me.$content.append($('<section id="room-' + room.room_id + '"><div class="page-header"><h1>' + room.name + '</h1><div></section>'));
         }
     };
 
@@ -93,9 +109,15 @@ require([
 
         $('.nav-list').affix();
 
+
+        $('section [href^=#]').click(function (e) {
+            e.preventDefault()
+        });
+
         var viewer = new Viewer({
             $urlModal: $('#url-modal'),
-            $sidebar: $('#navbar')
+            $sidebar: $('#navbar'),
+            $content: $('#content')
         });
 
     });
