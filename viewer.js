@@ -14,8 +14,9 @@ require([
             this.url = this.defaultUrl;
         }
 
-        var expand = new ExpandButton();
-        this.$content.append(expand.dom);
+        this.expandAll = new ExpandButton();
+        this.$content.append(this.expandAll.dom);
+        this.expandAll.dom.hide();
 
         var me = this;
         me.load(this.url, {
@@ -87,6 +88,7 @@ require([
                         me.users[user.user_id] = user;
                     });
                     me.loadRooms(args);
+                    me.expandAll.dom.show();
                 }
             }));
         },
@@ -176,8 +178,6 @@ require([
                 url: roomURL + logFile,
                 success: function (logContent) {
                     $.each(logContent, function (j, post) {
-
-                        console.log('post', post);
 
                         if (post.message) {
                             post.message = me.bleep(post.message);
