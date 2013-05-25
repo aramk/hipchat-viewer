@@ -7,7 +7,7 @@ require([
         this.$urlModal = args.$urlModal;
         this.$sidebar = args.$sidebar;
         this.$content = args.$content;
-        this.dataType = 'json' || args.dataType;
+
         this.defaultUrl = this.currentURL() + 'hipchat_export/';
 
         if (!this.url) {
@@ -45,6 +45,7 @@ require([
             $submit.click(function (e) {
                 e.stopPropagation();
                 var url = $url.val();
+                this.dataType = $('.request-type:checked', me.$urlModal).val() || 'json';
                 if (url.length) {
                     $urlGroup.removeClass('error');
                     $alert.addClass('hide');
@@ -262,7 +263,7 @@ require([
         $('.nav-list').affix();
 
         $('section [href^=#]').click(function (e) {
-            e.preventDefault()
+            e.preventDefault();
         });
 
         var viewer = new Viewer({
