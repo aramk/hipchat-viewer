@@ -79,6 +79,7 @@ require([
             $.ajax($.extend($.extend({}, args), {
                 dataType: me.dataType,
                 url: me.url + me.usersDir + me.listFilename,
+                async: me.async,
                 success: function (data) {
                     me.users = {};
                     $.each(data.users, function (i, user) {
@@ -94,6 +95,7 @@ require([
             $.ajax($.extend(args, {
                 dataType: me.dataType,
                 url: me.url + me.roomsDir + me.listFilename,
+                async: false,
                 success: function (data) {
                     if (successCallback) {
                         successCallback(data);
@@ -101,11 +103,11 @@ require([
                     me.rooms = data.rooms;
                     me.$sidebar.html('');
                     $.each(me.rooms, function (i, room) {
-                            me.addRoom(room);
+                        me.addRoom(room);
                     });
-                    $('body').scrollspy({target: '.bs-docs-sidebar'});
                 }
             }));
+            $('body').scrollspy({target: '.bs-docs-sidebar'});
         },
         addRoom: function (room) {
             var me = this;
@@ -122,6 +124,7 @@ require([
             $.ajax({
                 dataType: me.dataType,
                 url: roomURL + me.listFilename,
+                async: false,
                 success: function (logFiles) {
                     $.each(logFiles, function (i, logFile) {
                         var date = logFile.replace(/\.json$/, '');
