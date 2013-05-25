@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>HipChat Viewer</title>
+    <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="lib/bootstrap/css/bootstrap-responsive.min.css"/>
+    <script type="text/javascript" src="lib/jquery-1.10.0.min.js"></script>
+    <script type="text/javascript" src="lib/bootstrap/js/bootstrap.js"></script>
+    <script type="text/javascript" src="lib/require.js"></script>
+    <script type="text/javascript" src="viewer.js"></script>
+</head>
+<body>
+
+<div id="url-modal" class="modal hide fade" tabindex="-1" role="dialog">
+    <div class="modal-header">
+        <h3 id="placeholderLabel">HipChat Viewer</h3>
+    </div>
+    <div class="modal-body">
+        <p>Type the url to the chat log archive. Make sure it's accessible in the browser!</p>
+
+        <div class="control-group">
+            <input class="url" style="width: 90%" type="text" placeholder=""/>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal">Cancel</button>
+        <button class="btn btn-primary submit" data-dismiss="modal">Submit</button>
+    </div>
+</div>
+
+</body>
+</html>
