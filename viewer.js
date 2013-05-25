@@ -9,8 +9,6 @@ require([
         this.$content = args.$content;
         this.dataType = 'json' || args.dataType;
         this.defaultUrl = this.currentURL() + 'hipchat_export/';
-//        this.postCount = 0;
-//        this.postLimit = 10;
 
         if (!this.url) {
             this.url = this.defaultUrl;
@@ -28,6 +26,7 @@ require([
 
         listFilename: 'list.json',
         roomsDir: 'rooms/',
+        usersDir: 'users/',
 
         askURL: function (args) {
             var me = this;
@@ -75,6 +74,20 @@ require([
         load: function (url, args) {
             var me = this;
             me.url = me.addSlash(url || this.url);
+            $.ajax($.extend($.extend({}, args), {
+                dataType: me.dataType,
+                url: me.url + me.usersDir + me.listFilename,
+                success: function (data) {
+                    me.users = {};
+                    $.each(data.users, function (i, user) {
+                        me.users[user.user_id] = user;
+                    });
+                    me.loadRooms(args);
+                }
+            }));
+        },
+        loadRooms: function (args) {
+            var me = this;
             var successCallback = args.success;
             $.ajax($.extend(args, {
                 dataType: me.dataType,
@@ -90,7 +103,6 @@ require([
                             me.addRoom(room);
                         }
                     });
-
                     $('body').scrollspy({target: '.bs-docs-sidebar'});
                 }
             }));
@@ -98,14 +110,9 @@ require([
         addRoom: function (room) {
             var me = this;
 
-//            if (me.postCount >= me.postLimit) {
-//                console.log('skip');
-//                return;
-//            }
-
             me.$sidebar.append($('<li><a href="#room-' + room.room_id + '"><i class="icon-chevron-right"></i> ' + room.name + '</a></li>'));
-            var $section = $('<section id="room-' + room.room_id + '"><div class="page-header"><h1>' + room.name + '</h1><div></section>');
-            me.$content.append($section);
+            var $roomSection = $('<section id="room-' + room.room_id + '"><div class="page-header"><h1>' + room.name + '</h1><div></section>');
+            me.$content.append($roomSection);
 
             var roomURL = me.url + me.roomsDir + room.name + '/';
             $.ajax({
@@ -113,51 +120,93 @@ require([
                 url: roomURL + me.listFilename,
                 success: function (logFiles) {
 
-//                    if (me.postCount >= me.postLimit) {
-//                        console.log('skip');
-//                        return;
-//                    }
-
                     console.log('logs', logFiles);
 
                     $.each(logFiles, function (i, logFile) {
                         var date = logFile.replace(/\.json$/, '');
-                        var $log = $('<h2>' + date + '</h2>');
-                        $section.append($log);
-//                        if (me.postCount >= me.postLimit) {
-//                            console.log('skip');
-//                            return;
-//                        }
-
-                        var $table = $('<table class="table"></table>');
-                        $section.append($table);
-
-                        $.ajax({
-                            dataType: me.dataType,
-                            url: roomURL + logFile,
-                            success: function (logContent) {
-                                $.each(logContent, function (j, post) {
-//                                    me.postCount++;
-//                                    if (post) {
-                                    if (post.message) {
-                                        post.message = me.bleep(post.message);
-                                        post.message = me.linkify(post.message);
-                                        post.message = me.mentions(post.message);
-                                        post.message = post.message.replace('http: //', 'http://');
-                                    }
-
-                                    var name = post.from ? post.from.name : 'Anonymous';
-                                        var $row = $('<tr><td class="user">' + name + '</td><td class="message">' + post.message + '</td></tr>');
-                                        $table.append($row);
-//                                        console.log(post);
-//                                    }
+                        var $log = $('<h2><a class="log" href="#"><span class="log-show">+</span><span class="log-hide">-</span> ' + me.dateString(date) + '</a></h2>');
+                        $roomSection.append($log);
+                        var $logSection = $('<div></div>');
+                        $roomSection.append($logSection);
+                        var $visible = false;
+                        var $loaded = false;
+                        $logSection.hide();
+                        $log.click(function (e) {
+                            e.preventDefault();
+                            if (!$loaded) {
+                                me.loadLog({
+                                    $logSection: $logSection,
+                                    roomURL: roomURL,
+                                    logFile: logFile
                                 });
+                                $loaded = true;
                             }
+                            if ($visible) {
+                                $logSection.hide();
+                                $log.removeClass('log-visible');
+                            } else {
+                                $logSection.show();
+                                $log.addClass('log-visible');
+                            }
+                            $visible = !$visible;
                         });
+
                     });
                 }
             });
+        },
 
+        loadLog: function (args) {
+            var me = this;
+            var $table = $('<table class="table"></table>');
+
+            var $logSection = args.$logSection;
+            var roomURL = args.roomURL;
+            var logFile = args.logFile;
+
+            $logSection.append($table);
+
+            $.ajax({
+                dataType: me.dataType,
+                url: roomURL + logFile,
+                success: function (logContent) {
+                    $.each(logContent, function (j, post) {
+                        if (post.message) {
+                            post.message = me.bleep(post.message);
+                            post.message = me.linkify(post.message);
+                            post.message = me.mentions(post.message);
+                            post.message = post.message.replace('http: //', 'http://');
+                        }
+
+                        var user_id = post.from ? post.from.user_id : null;
+                        var name = 'Anonymous';
+                        var user = null;
+                        var mention = null;
+                        if (user_id) {
+                            user = me.users[user_id];
+                            if (user) {
+                                name = user.name;
+                                mention = user.mention_name;
+                            }
+                        }
+
+                        var $row = $('<tr></tr>');
+                        var $user = $('<td class="user"></td>');
+                        var $userInner = $('<div title="@' + mention + '">' + name + '</div>');
+                        var $message = $('<td class="message"></td>');
+                        var $messageInner = $('<div>' + post.message + '</div>');
+                        $row.append($user);
+                        $user.append($userInner);
+                        $message.append($messageInner);
+                        $row.append($message);
+                        $table.append($row);
+                    });
+                }
+            });
+        },
+
+        dateString: function (date) {
+            return moment(date).format('MMMM D, YYYY');
         },
         bleep: function (str) {
             var me = this;
@@ -182,7 +231,6 @@ require([
 //        // TODO move to caller script
 
         $('.nav-list').affix();
-
 
         $('section [href^=#]').click(function (e) {
             e.preventDefault()

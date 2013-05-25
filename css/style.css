@@ -1,6 +1,6 @@
 .user {
     font-weight: bold;
-    width: 120px;
+    max-width: 120px;
     background: #eee;
 }
 
@@ -9,4 +9,33 @@
     color: #fff;
     padding: 2px 4px;
     border-radius: 3px;
+}
+
+.tooltip {
+    /*display: none !important;*/
+    /*position: absolute !important;;*/
+}
+
+h1 {
+    font-size: 28px;
+    line-height: 30px;
+}
+
+h2 {
+    font-size: 20px;
+    line-height: 24px;
+}
+
+.page-header {
+    margin-bottom: 10px;
+}
+
+.log .log-hide {
+    display: none;
+}
+.log-visible .log-show {
+    display: none;
+}
+.log-visible .log-hide {
+    display: inline;
 }
