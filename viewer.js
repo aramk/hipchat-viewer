@@ -9,6 +9,9 @@ require([
         this.$content = args.$content;
         this.dataType = 'json' || args.dataType;
         this.defaultUrl = this.currentURL() + 'hipchat_export/';
+//        this.postCount = 0;
+//        this.postLimit = 10;
+
         if (!this.url) {
             this.url = this.defaultUrl;
         }
@@ -83,7 +86,9 @@ require([
                     me.rooms = data.rooms;
                     me.$sidebar.html('');
                     $.each(me.rooms, function (i, room) {
-                        me.addRoom(room);
+                        if (i < 1) { // TODO remove
+                            me.addRoom(room);
+                        }
                     });
 
                     $('body').scrollspy({target: '.bs-docs-sidebar'});
@@ -92,6 +97,12 @@ require([
         },
         addRoom: function (room) {
             var me = this;
+
+//            if (me.postCount >= me.postLimit) {
+//                console.log('skip');
+//                return;
+//            }
+
             me.$sidebar.append($('<li><a href="#room-' + room.room_id + '"><i class="icon-chevron-right"></i> ' + room.name + '</a></li>'));
             var $section = $('<section id="room-' + room.room_id + '"><div class="page-header"><h1>' + room.name + '</h1><div></section>');
             me.$content.append($section);
@@ -101,22 +112,59 @@ require([
                 dataType: me.dataType,
                 url: roomURL + me.listFilename,
                 success: function (logFiles) {
+
+//                    if (me.postCount >= me.postLimit) {
+//                        console.log('skip');
+//                        return;
+//                    }
+
                     console.log('logs', logFiles);
+
                     $.each(logFiles, function (i, logFile) {
                         var date = logFile.replace(/\.json$/, '');
-                        var $log = $('<h2>'+ date +'</h2>');
+                        var $log = $('<h2>' + date + '</h2>');
                         $section.append($log);
-//                        $.ajax({
-//                            dataType: me.dataType,
-//                            url: roomURL + logFile,
-//                            success: function (logContent) {
-//                                console.log(logContent);
-//                            }
-//                        });
+//                        if (me.postCount >= me.postLimit) {
+//                            console.log('skip');
+//                            return;
+//                        }
+
+                        var $table = $('<table class="table"></table>');
+                        $section.append($table);
+
+                        $.ajax({
+                            dataType: me.dataType,
+                            url: roomURL + logFile,
+                            success: function (logContent) {
+                                $.each(logContent, function (j, post) {
+//                                    me.postCount++;
+
+                                    post = me.cleanPost(post);
+
+                                    var $row = $('<tr><td class="user">' + post.from.name + '</td><td class="message">' + post.message + '</td></tr>');
+
+                                    $table.append($row);
+
+                                    console.log(post);
+                                });
+                            }
+                        });
                     });
                 }
             });
 
+        },
+        cleanPost: function (post) {
+            var me = this;
+            var badWords = ['fuck'];
+            $.each(badWords, function (i, word) {
+                var bleep = Array(word.length + 1).join('*');
+                post.message = me.linkify(post.message.replace(word, bleep));
+            });
+            return post;
+        },
+        linkify: function (str) {
+            return str.replace(/([\w]+:\/\/[\S]*)/g, '<a href="$1" target="_blank">$1</a>');
         }
     };
 
