@@ -53,7 +53,6 @@ require([
                             me.$urlModal.modal('hide');
                         },
                         error: function () {
-                            console.log('error');
                             $url.focus();
                             $alert.removeClass('hide');
                         }
@@ -102,9 +101,7 @@ require([
                     me.rooms = data.rooms;
                     me.$sidebar.html('');
                     $.each(me.rooms, function (i, room) {
-                        if (i < 1) { // TODO remove
                             me.addRoom(room);
-                        }
                     });
                     $('body').scrollspy({target: '.bs-docs-sidebar'});
                 }
@@ -126,9 +123,6 @@ require([
                 dataType: me.dataType,
                 url: roomURL + me.listFilename,
                 success: function (logFiles) {
-
-                    console.log('logs', logFiles);
-
                     $.each(logFiles, function (i, logFile) {
                         var date = logFile.replace(/\.json$/, '');
                         var $log = $('<h2><a class="log" href="#"><span class="log-show">+</span><span class="log-hide">-</span> ' + me.dateString(date) + '</a></h2>');
@@ -178,6 +172,9 @@ require([
                 url: roomURL + logFile,
                 success: function (logContent) {
                     $.each(logContent, function (j, post) {
+
+                        console.log('post', post);
+
                         if (post.message) {
                             post.message = me.bleep(post.message);
                             post.message = me.linkify(post.message);
@@ -208,6 +205,9 @@ require([
                         $row.append($message);
                         $table.append($row);
                     });
+                },
+                error: function (logContent) {
+                    // Probably related to http://help.hipchat.com/forums/138883-suggestions/suggestions/3996693-online-log-export-viewer
                 }
             });
         },
