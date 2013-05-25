@@ -47,3 +47,5 @@ Thumbs.db
 *.pyc
 
 /.idea
+hipchat_export/*
+!hipchat_export/README.md
