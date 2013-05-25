@@ -138,14 +138,19 @@ require([
                             success: function (logContent) {
                                 $.each(logContent, function (j, post) {
 //                                    me.postCount++;
+//                                    if (post) {
+                                    if (post.message) {
+                                        post.message = me.bleep(post.message);
+                                        post.message = me.linkify(post.message);
+                                        post.message = me.mentions(post.message);
+                                        post.message = post.message.replace('http: //', 'http://');
+                                    }
 
-                                    post = me.cleanPost(post);
-
-                                    var $row = $('<tr><td class="user">' + post.from.name + '</td><td class="message">' + post.message + '</td></tr>');
-
-                                    $table.append($row);
-
-                                    console.log(post);
+                                    var name = post.from ? post.from.name : 'Anonymous';
+                                        var $row = $('<tr><td class="user">' + name + '</td><td class="message">' + post.message + '</td></tr>');
+                                        $table.append($row);
+//                                        console.log(post);
+//                                    }
                                 });
                             }
                         });
@@ -154,14 +159,19 @@ require([
             });
 
         },
-        cleanPost: function (post) {
+        bleep: function (str) {
             var me = this;
             var badWords = ['fuck'];
             $.each(badWords, function (i, word) {
-                var bleep = Array(word.length + 1).join('*');
-                post.message = me.linkify(post.message.replace(word, bleep));
+                if (str) {
+                    var bleeps = Array(word.length + 1).join('*');
+                    str = str.replace(word, bleeps);
+                }
             });
-            return post;
+            return str;
+        },
+        mentions: function (str) {
+            return str.replace(/(@[\w+]+)/gi, '<span class="mention">$1</span>');
         },
         linkify: function (str) {
             return str.replace(/([\w]+:\/\/[\S]*)/g, '<a href="$1" target="_blank">$1</a>');

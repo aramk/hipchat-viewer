@@ -3,3 +3,10 @@
     width: 120px;
     background: #eee;
 }
+
+.mention {
+    background: #0078cc;
+    color: #fff;
+    padding: 2px 4px;
+    border-radius: 3px;
+}
