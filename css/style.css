@@ -21,6 +21,19 @@ h1 {
     line-height: 30px;
 }
 
+.page-header {
+    padding-bottom: 0;
+}
+.page-header h1 {
+    display: inline-block;
+}
+.page-header div {
+    float: left;
+}
+.page-header .btn {
+    float: right;
+}
+
 h2 {
     font-size: 20px;
     line-height: 24px;

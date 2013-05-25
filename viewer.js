@@ -14,6 +14,9 @@ require([
             this.url = this.defaultUrl;
         }
 
+        var expand = new ExpandButton();
+        this.$content.append(expand.dom);
+
         var me = this;
         me.load(this.url, {
             error: function () {
@@ -111,7 +114,11 @@ require([
             var me = this;
 
             me.$sidebar.append($('<li><a href="#room-' + room.room_id + '"><i class="icon-chevron-right"></i> ' + room.name + '</a></li>'));
-            var $roomSection = $('<section id="room-' + room.room_id + '"><div class="page-header"><h1>' + room.name + '</h1><div></section>');
+            var $roomSection = $('<section id="room-' + room.room_id + '"></section>');
+            var $header = $('<div class="page-header"><h1>' + room.name + '</h1><div>');
+            $roomSection.append($header);
+            var expand = new ExpandButton($roomSection);
+            $header.append(expand.dom);
             me.$content.append($roomSection);
 
             var roomURL = me.url + me.roomsDir + room.name + '/';
@@ -128,27 +135,27 @@ require([
                         $roomSection.append($log);
                         var $logSection = $('<div></div>');
                         $roomSection.append($logSection);
-                        var $visible = false;
-                        var $loaded = false;
+                        var visible = false;
+                        var loaded = false;
                         $logSection.hide();
                         $log.click(function (e) {
                             e.preventDefault();
-                            if (!$loaded) {
+                            if (!loaded) {
                                 me.loadLog({
                                     $logSection: $logSection,
                                     roomURL: roomURL,
                                     logFile: logFile
                                 });
-                                $loaded = true;
+                                loaded = true;
                             }
-                            if ($visible) {
+                            if (visible) {
                                 $logSection.hide();
                                 $log.removeClass('log-visible');
                             } else {
                                 $logSection.show();
                                 $log.addClass('log-visible');
                             }
-                            $visible = !$visible;
+                            visible = !visible;
                         });
 
                     });
@@ -225,6 +232,25 @@ require([
         linkify: function (str) {
             return str.replace(/([\w]+:\/\/[\S]*)/g, '<a href="$1" target="_blank">$1</a>');
         }
+    };
+
+    var ExpandButton = function (container) {
+        var me = this;
+        var on = false;
+        me.dom = $('<button id="expand-all" class="btn btn-primary" data-dismiss="modal" data-toggle="button" data-on="Collapse All" data-off="Expand All"></button>');
+        var update = function () {
+            if (on) {
+                me.dom.text(me.dom.attr('data-on'));
+            } else {
+                me.dom.text(me.dom.attr('data-off'));
+            }
+        };
+        update();
+        me.dom.click(function () {
+            $('.log', container).trigger('click');
+            on = !on;
+            update();
+        });
     };
 
     $(function () {
