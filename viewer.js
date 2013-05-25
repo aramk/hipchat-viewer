@@ -4,7 +4,8 @@ require([
 
     var Viewer = function (args) {
         this.url = null;
-        this.urlModal = args.urlModal;
+        this.$urlModal = args.$urlModal;
+        this.$sidebar = args.$sidebar;
         this.dataType = 'json' || args.dataType;
         this.defaultUrl = this.currentURL() + 'hipchat_export/';
         if (!this.url) {
@@ -25,12 +26,12 @@ require([
 
         askURL: function (args) {
             var me = this;
-            this.urlModal.modal();
-            var $url = $('.url', this.urlModal);
+            this.$urlModal.modal();
+            var $url = $('.url', this.$urlModal);
             var $urlGroup = $url.closest('.control-group');
-            var $submit = $('.submit', this.urlModal);
-            var $alert = $('.alert', this.urlModal);
-            this.urlModal.on('shown', function () {
+            var $submit = $('.submit', this.$urlModal);
+            var $alert = $('.alert', this.$urlModal);
+            this.$urlModal.on('shown', function () {
                 $url.focus();
             });
             $url.attr('placeholder', window.location.protocol + '//' + window.location.host + '/somepath');
@@ -42,7 +43,7 @@ require([
                     $alert.addClass('hide');
                     me.load(url, {
                         success: function () {
-                            me.urlModal.modal('hide');
+                            me.$urlModal.modal('hide');
                         },
                         error: function () {
                             console.log('error');
@@ -77,7 +78,11 @@ require([
                     if (successCallback) {
                         successCallback(data);
                     }
-                    console.log(data);
+                    this.rooms = data.rooms;
+                    me.$sidebar.html('');
+                    $.each(this.rooms, function (i, room) {
+                        me.$sidebar.append($('<li><a href="#'+room.room_id+'"><i class="icon-chevron-right"></i> '+room.name+'</a></li>'));
+                    });
                 }
             }));
         }
@@ -85,9 +90,14 @@ require([
 
     $(function () {
 //        // TODO move to caller script
+
+        $('.nav-list').affix();
+
         var viewer = new Viewer({
-            urlModal: $("#url-modal")
+            $urlModal: $('#url-modal'),
+            $sidebar: $('#navbar')
         });
+
     });
 
 });
