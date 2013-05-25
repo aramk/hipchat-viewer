@@ -36,7 +36,7 @@ Dir.foreach(room_dir) do |item|
     puts "> Found room '#{item}'"
     chat_files = []
     Dir.foreach(abs_path) do |chat_file|
-      next if chat_file == '.' or chat_file == '..'
+      next if chat_file == '.' or chat_file == '..' or chat_file == list_filename
       chat_files.push(chat_file)
       puts "    Found chat log in #{item}/#{chat_file}"
     end

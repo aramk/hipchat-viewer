@@ -23,7 +23,8 @@ require([
 
     Viewer.prototype = {
 
-        roomsURL: 'rooms/list.json',
+        listFilename: 'list.json',
+        roomsDir: 'rooms/',
 
         askURL: function (args) {
             var me = this;
@@ -74,7 +75,7 @@ require([
             var successCallback = args.success;
             $.ajax($.extend(args, {
                 dataType: me.dataType,
-                url: me.url + me.roomsURL,
+                url: me.url + me.roomsDir + me.listFilename,
                 success: function (data) {
                     if (successCallback) {
                         successCallback(data);
@@ -86,21 +87,36 @@ require([
                     });
 
                     $('body').scrollspy({target: '.bs-docs-sidebar'});
-
-//                    $.ajax($.extend(args, {
-//                        dataType: me.dataType,
-//                        url: me.url + me.roomsURL,
-//                        success: function (data) {
-//
-//                        }
-//                    }));
                 }
             }));
         },
         addRoom: function (room) {
             var me = this;
             me.$sidebar.append($('<li><a href="#room-' + room.room_id + '"><i class="icon-chevron-right"></i> ' + room.name + '</a></li>'));
-            me.$content.append($('<section id="room-' + room.room_id + '"><div class="page-header"><h1>' + room.name + '</h1><div></section>'));
+            var $section = $('<section id="room-' + room.room_id + '"><div class="page-header"><h1>' + room.name + '</h1><div></section>');
+            me.$content.append($section);
+
+            var roomURL = me.url + me.roomsDir + room.name + '/';
+            $.ajax({
+                dataType: me.dataType,
+                url: roomURL + me.listFilename,
+                success: function (logFiles) {
+                    console.log('logs', logFiles);
+                    $.each(logFiles, function (i, logFile) {
+                        var date = logFile.replace(/\.json$/, '');
+                        var $log = $('<h2>'+ date +'</h2>');
+                        $section.append($log);
+//                        $.ajax({
+//                            dataType: me.dataType,
+//                            url: roomURL + logFile,
+//                            success: function (logContent) {
+//                                console.log(logContent);
+//                            }
+//                        });
+                    });
+                }
+            });
+
         }
     };
 
