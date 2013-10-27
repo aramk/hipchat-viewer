@@ -2,8 +2,22 @@ require([
 //    'lib/jquery-1.10.0.min'
 ], function (jQuery) { // TODO get this require working
 
-  var
-  Viewer = function (args) {
+  var stats = {
+    'Rooms': 0,
+    'Log Files': 0,
+    'Messages': 0,
+    'Words': 0
+  };
+
+  var renderStats = function () {
+    var statsTable = $('.stats table');
+    statsTable.empty();
+    for (var stat in stats) {
+      statsTable.append($('<tr><th>' + stat + '</th><td>' + stats[stat] + '</td></tr>'));
+    }
+  };
+
+  var Viewer = function (args) {
     this.url = null;
     this.$urlModal = args.$urlModal;
     this.$sidebar = args.$sidebar;
@@ -20,7 +34,10 @@ require([
     this.expandAll.dom.hide();
 
     var me = this;
-    me.load(this.url, {
+    return me.load(this.url, {
+      success: function () {
+        renderStats();
+      },
       error: function () {
         me.askURL();
       }
@@ -79,7 +96,7 @@ require([
     load: function (url, args) {
       var me = this;
       me.url = me.addSlash(url || this.url);
-      $.ajax($.extend($.extend({}, args), {
+      return $.ajax($.extend($.extend({}, args), {
         dataType: me.dataType,
         url: me.url + me.usersDir + me.listFilename,
         async: me.async,
@@ -109,6 +126,8 @@ require([
           $.each(me.rooms, function (i, room) {
             me.addRoom(room);
           });
+          stats.Rooms = data.rooms.length;
+          renderStats();
         }
       }));
       $('body').scrollspy({target: '.bs-docs-sidebar'});
@@ -146,7 +165,7 @@ require([
                   $logSection: $logSection,
                   roomURL: roomURL,
                   logFile: logFile
-                });
+                }).done(renderStats);
                 loaded = true;
               }
               if (visible) {
@@ -158,8 +177,9 @@ require([
               }
               visible = !visible;
             });
-
           });
+          stats['Log Files'] += logFiles.length;
+          renderStats();
         }
       });
     },
@@ -174,13 +194,18 @@ require([
 
       $logSection.append($table);
 
-      $.ajax({
+      return $.ajax({
         dataType: me.dataType,
         url: roomURL + logFile,
         success: function (logContent) {
+          stats.Messages += logContent.length;
           $.each(logContent, function (j, post) {
 
             if (post.message) {
+              var matches = post.message.match(/\b\w+\b/g);
+              if (matches) {
+                stats.Words += matches.length;
+              }
               post.message = me.bleep(post.message);
               post.message = me.linkify(post.message);
               post.message = me.mentions(post.message);
@@ -249,6 +274,7 @@ require([
       } else {
         me.dom.text(me.dom.attr('data-off'));
       }
+      renderStats();
     };
     update();
     me.dom.click(function () {
