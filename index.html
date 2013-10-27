@@ -1,59 +1,78 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>HipChat Viewer</title>
-    <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.min.css"/>
-    <link rel="stylesheet" href="lib/bootstrap/css/bootstrap-responsive.min.css"/>
-    <link rel="stylesheet" href="css/docs.css"/>
-    <link rel="stylesheet" href="css/style.css"/>
-    <script type="text/javascript" src="lib/jquery-1.10.0.min.js"></script>
-    <script type="text/javascript" src="lib/moment.min.js"></script>
-    <script type="text/javascript" src="lib/bootstrap/js/bootstrap.js"></script>
-    <script type="text/javascript" src="lib/require.js"></script>
-    <script type="text/javascript" src="viewer.js"></script>
+  <title>HipChat Viewer</title>
+  <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.min.css" />
+  <link rel="stylesheet"
+        href="lib/bootstrap/css/bootstrap-responsive.min.css" />
+  <link rel="stylesheet" href="css/docs.css" />
+  <link rel="stylesheet" href="css/style.css" />
+  <script type="text/javascript" src="lib/jquery-1.10.0.min.js"></script>
+  <script type="text/javascript" src="lib/moment.min.js"></script>
+  <script type="text/javascript" src="lib/bootstrap/js/bootstrap.js"></script>
+  <script type="text/javascript" src="lib/require.js"></script>
+  <script type="text/javascript" src="viewer.js"></script>
 </head>
 <body>
 
-<a href="https://github.com/aramkocharyan/hipchat-viewer" target="_blank"><img
-        style="position: absolute; top: 0; right: 0; border: 0;"
-        src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"></a>
+  <a href="https://github.com/aramkocharyan/hipchat-viewer" target="_blank"><img
+      style="position: absolute; top: 0; right: 0; border: 0;"
+      src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"
+      alt="Fork me on GitHub"></a>
 
-<div id="url-modal" class="modal hide fade" tabindex="-1" role="dialog">
+  <div id="url-modal" class="modal hide fade" tabindex="-1" role="dialog">
     <div class="modal-header">
-        <h3 id="placeholderLabel">HipChat Log Export Viewer</h3>
+      <h3 id="placeholderLabel">HipChat Log Export Viewer</h3>
     </div>
     <div class="modal-body">
-        <p>Type the url to the chat log archive. Make sure it's accessible in the browser!</p>
+      <p>Type the url to the chat log archive. Make sure it's accessible in the
+        browser!</p>
 
-        <div class="control-group">
-            <input class="url" style="width: 90%" type="text" placeholder=""/>
-            <label class="checkbox">
-                <input class="request-type" type="checkbox" value="jsonp"/> JSONP
-            </label>
-        </div>
-        <div class="alert alert-danger hide" style="margin-bottom: 0;">
-            The URL failed to load!
-        </div>
+      <div class="control-group">
+        <input class="url" style="width: 90%" type="text" placeholder="" />
+        <label class="checkbox">
+          <input class="request-type" type="checkbox" value="jsonp" /> JSONP
+        </label>
+      </div>
+      <div class="alert alert-danger hide" style="margin-bottom: 0;">
+        The URL failed to load!
+      </div>
     </div>
     <div class="modal-footer">
-        <button class="btn" data-dismiss="modal">Cancel</button>
-        <button class="btn btn-primary submit" data-dismiss="modal">Submit</button>
+      <button class="btn" data-dismiss="modal">Cancel</button>
+      <button class="btn btn-primary submit" data-dismiss="modal">Submit
+      </button>
     </div>
-</div>
+  </div>
 
-<div class="container">
+  <div class="container">
     <div class="row">
-        <div class="span3 bs-docs-sidebar">
-            <ul id="navbar" class="nav bs-docs-sidenav nav-list" data-spy="affix">
-            </ul>
-        </div>
-        <div id="content" class="span9">
-            <h1>HipChat Log Export Viewer</h1>
+      <div class="span3 bs-docs-sidebar">
+        <ul id="navbar" class="nav bs-docs-sidenav nav-list" data-spy="affix">
+        </ul>
+      </div>
+      <div id="content" class="span9">
+        <h1>HipChat Log Export Viewer</h1>
 
-            <p>The rooms appear on the left. Click the dates in each room to load the posts on that day.</p>
+        <p>The rooms appear on the left. Click the dates in each room to load
+          the posts on that day. Statistics are loaded incrementally as you browse.</p>
+
+        <div class="stats">
+          <h4>Statistics</h4>
+          <table class="table">
+            <tr>
+              <th>Words</th>
+              <td></td>
+            </tr>
+            <tr>
+              <th>Messages</th>
+              <td></td>
+            </tr>
+          </table>
         </div>
+      </div>
     </div>
-</div>
+  </div>
 
 </body>
 </html>
