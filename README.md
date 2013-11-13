@@ -27,3 +27,5 @@ It will automatically load logs from the `hipchat_export` folder if found, other
 And load the logs from here:
 
     http://localhost/some/other/path/hipchat_export
+
+![image](https://raw.github.com/aramkocharyan/hipchat-viewer/master/help/screenshot.png)
